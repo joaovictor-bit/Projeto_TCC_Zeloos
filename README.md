@@ -61,3 +61,4 @@ Substitua `192.168.0.10` pelo IP do computador na rede local. Durante o desenvol
 
 ## Observações
 O projeto foi estruturado para funcionar com dados reais e também com modo de demonstração, em que o app identifica claramente a origem dos dados simulados.
+"# Projeto_TCC_Zeloos" 

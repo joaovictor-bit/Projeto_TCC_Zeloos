@@ -96,7 +96,7 @@ class _AccessScreenState extends State<AccessScreen>
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.navy.withValues(alpha: .08),
+                          color: context.palette.title.withValues(alpha: .08),
                           blurRadius: 32,
                           offset: const Offset(0, 14),
                         ),
@@ -109,31 +109,31 @@ class _AccessScreenState extends State<AccessScreen>
                           width: 76,
                           height: 76,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE9EDFF),
+                            color: context.palette.iconBg,
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.verified_user_rounded,
-                            color: AppTheme.blue,
+                            color: context.palette.accent,
                             size: 40,
                           ),
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'Acesso confirmado',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: AppTheme.navy,
+                            color: context.palette.title,
                             fontSize: 25,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Sua conta está conectada. Toque em Entrar para acessar as configurações da sua família.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: AppTheme.muted,
+                            color: context.palette.muted,
                             fontSize: 15,
                             height: 1.5,
                           ),
@@ -146,14 +146,14 @@ class _AccessScreenState extends State<AccessScreen>
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.background,
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.mail_outline_rounded,
-                                color: AppTheme.muted,
+                                color: context.palette.muted,
                                 size: 20,
                               ),
                               const SizedBox(width: 10),
@@ -161,8 +161,8 @@ class _AccessScreenState extends State<AccessScreen>
                                 child: Text(
                                   widget.email,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: AppTheme.navy,
+                                  style: TextStyle(
+                                    color: context.palette.title,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -195,11 +195,11 @@ class _AccessScreenState extends State<AccessScreen>
                                 decoration: BoxDecoration(
                                   color: _hovered
                                       ? const Color(0xFF172575)
-                                      : AppTheme.navy,
+                                      : context.palette.title,
                                   borderRadius: BorderRadius.circular(16),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppTheme.navy.withValues(
+                                      color: context.palette.title.withValues(
                                         alpha: _hovered ? .24 : .16,
                                       ),
                                       blurRadius: _hovered ? 18 : 12,

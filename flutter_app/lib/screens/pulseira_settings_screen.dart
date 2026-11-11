@@ -4,14 +4,14 @@ import '../models/child_profile.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class PulseiraSettingsScreen extends StatefulWidget {
+  const PulseiraSettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<PulseiraSettingsScreen> createState() => _PulseiraSettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _PulseiraSettingsScreenState extends State<PulseiraSettingsScreen> {
   List<ChildProfile> _children = [];
   int? _selectedChildId;
   bool _loading = true;
@@ -116,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configurações'),
+        title: const Text('Configurações da pulseira'),
         actions: [
           IconButton(
             onPressed: _loading ? null : _loadChildren,
@@ -134,18 +134,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                const Text(
+                Text(
                   'Alertas de segurança',
                   style: TextStyle(
-                    color: AppTheme.navy,
+                    color: context.palette.title,
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Escolha o perfil e defina quais avisos deseja receber.',
-                  style: TextStyle(color: AppTheme.muted),
+                  style: TextStyle(color: context.palette.muted),
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<int>(
@@ -212,8 +212,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'Avisar com $_limiteBateria% de bateria',
-                  style: const TextStyle(
-                    color: AppTheme.navy,
+                  style: TextStyle(
+                    color: context.palette.title,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -261,7 +261,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 48, color: AppTheme.muted),
+            Icon(Icons.cloud_off_rounded, size: 48, color: context.palette.muted),
             const SizedBox(height: 12),
             Text(_error!, textAlign: TextAlign.center),
             const SizedBox(height: 16),
@@ -273,13 +273,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _emptyView() {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(28),
+        padding: const EdgeInsets.all(28),
         child: Text(
           'Cadastre um perfil infantil antes de configurar os alertas.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppTheme.muted),
+          style: TextStyle(color: context.palette.muted),
         ),
       ),
     );

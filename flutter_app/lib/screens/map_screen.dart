@@ -93,9 +93,9 @@ class _MapScreenState extends State<MapScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  const Text(
+                  Text(
                     'Escolha uma pulseira para abrir sua localização.',
-                    style: TextStyle(color: AppTheme.muted),
+                    style: TextStyle(color: context.palette.muted),
                   ),
                   const SizedBox(height: 12),
                   ..._pulseiras.map((pulseira) {
@@ -109,9 +109,9 @@ class _MapScreenState extends State<MapScreen> {
                           horizontal: 16,
                           vertical: 8,
                         ),
-                        leading: const CircleAvatar(
-                          backgroundColor: Color(0xFFE9EDFF),
-                          child: Icon(Icons.watch_rounded, color: AppTheme.navy),
+                        leading: CircleAvatar(
+                          backgroundColor: context.palette.iconBg,
+                          child: Icon(Icons.watch_rounded, color: context.palette.title),
                         ),
                         title: Text(
                           pulseira.nomeDispositivo ?? pulseira.identificador,
@@ -143,7 +143,7 @@ class _MapScreenState extends State<MapScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: AppTheme.muted),
+            Icon(icon, size: 48, color: context.palette.muted),
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),

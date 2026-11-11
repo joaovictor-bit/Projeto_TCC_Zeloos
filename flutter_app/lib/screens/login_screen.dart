@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../services/api_service.dart';
-import 'access_screen.dart';
+import 'dashboard_screen.dart';
 import '../theme/app_theme.dart';
+import '../utils/phone_input_formatter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController();
   bool _isRegister = false;
   bool _hidePassword = true;
   bool _loading = false;
@@ -29,10 +31,19 @@ class _LoginScreenState extends State<LoginScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   Future<void> _handleAuth({required bool isRegister}) async {
+    final phone = _phoneController.text.trim();
+    if (isRegister && !PhoneInputFormatter.isValid(phone)) {
+      setState(
+        () => _errorMessage = 'Telefone inválido. Informe DDD e número.',
+      );
+      return;
+    }
+
     setState(() {
       _loading = true;
       _errorMessage = null;
@@ -44,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
               nome: _nameController.text.trim(),
               email: _emailController.text.trim(),
               senha: _passwordController.text,
+              telefone: phone.isEmpty ? null : phone,
             )
           : await ApiService.login(
               email: _emailController.text.trim(),
@@ -54,16 +66,21 @@ class _LoginScreenState extends State<LoginScreen> {
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => AccessScreen(email: _emailController.text.trim()),
+            builder: (_) => DashboardScreen(
+              userName: (result['user'] as Map<String, dynamic>?)?['nome']
+                  as String?,
+            ),
           ),
         );
         return;
       }
 
       if (!mounted) return;
+      final errors = result['errors'];
       setState(
-        () =>
-            _errorMessage = result['message'] ?? 'Não foi possível autenticar.',
+        () => _errorMessage = errors is List && errors.isNotEmpty
+            ? (errors.first as Map<String, dynamic>)['message'] as String?
+            : result['message'] ?? 'Não foi possível autenticar.',
       );
     } on TimeoutException {
       if (!mounted) return;
@@ -168,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: Theme.of(context).textTheme.headlineSmall
                                   ?.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    color: AppTheme.navy,
+                                    color: context.palette.title,
                                   ),
                             ),
                             const SizedBox(height: 6),
@@ -176,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _isRegister
                                   ? 'Comece a cuidar da segurança da sua família.'
                                   : 'Entre para acompanhar sua família.',
-                              style: const TextStyle(color: AppTheme.muted),
+                              style: TextStyle(color: context.palette.muted),
                             ),
                             const SizedBox(height: 24),
                             if (_isRegister) ...[
@@ -188,6 +205,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                   prefixIcon: Icon(
                                     Icons.person_outline_rounded,
                                   ),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              TextField(
+                                controller: _phoneController,
+                                keyboardType: TextInputType.phone,
+                                inputFormatters: [PhoneInputFormatter()],
+                                decoration: const InputDecoration(
+                                  labelText: 'Telefone (opcional)',
+                                  hintText: '(11) 98765-4321',
+                                  prefixIcon: Icon(Icons.phone_outlined),
                                 ),
                               ),
                               const SizedBox(height: 14),

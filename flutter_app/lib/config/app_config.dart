@@ -11,6 +11,7 @@ class AppConfig {
         : 'http://10.0.2.2:3005';
   }
 
+  static const String appVersion = '1.0.0';
   static const Duration requestTimeout = Duration(seconds: 15);
   static const String authTokenKey = 'auth_token';
 }

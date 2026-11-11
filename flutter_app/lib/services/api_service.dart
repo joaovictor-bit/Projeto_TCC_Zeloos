@@ -50,12 +50,18 @@ class ApiService {
     required String nome,
     required String email,
     required String senha,
+    String? telefone,
   }) async {
     final response = await http
         .post(
           Uri.parse('$baseUrl/api/auth/register'),
           headers: authHeaders(),
-          body: jsonEncode({'nome': nome, 'email': email, 'senha': senha}),
+          body: jsonEncode({
+            'nome': nome,
+            'email': email,
+            'senha': senha,
+            'telefone': ?telefone,
+          }),
         )
         .timeout(AppConfig.requestTimeout);
 
@@ -64,6 +70,42 @@ class ApiService {
       await saveToken(data['token'] as String);
     }
     return data;
+  }
+
+  static Future<Map<String, dynamic>> fetchMe() async {
+    final token = await readToken();
+    final response = await http
+        .get(Uri.parse('$baseUrl/api/auth/me'), headers: authHeaders(token: token))
+        .timeout(AppConfig.requestTimeout);
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode != 200 || data['success'] != true) {
+      throw Exception(data['message'] ?? 'Não foi possível carregar a conta.');
+    }
+    return data['user'] as Map<String, dynamic>;
+  }
+
+  static Future<Map<String, dynamic>> updateMe({
+    required String nome,
+    String? telefone,
+  }) async {
+    final token = await readToken();
+    final response = await http
+        .put(
+          Uri.parse('$baseUrl/api/auth/me'),
+          headers: authHeaders(token: token),
+          body: jsonEncode({'nome': nome, 'telefone': telefone}),
+        )
+        .timeout(AppConfig.requestTimeout);
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode != 200 || data['success'] != true) {
+      final errors = data['errors'];
+      throw Exception(
+        errors is List && errors.isNotEmpty
+            ? (errors.first as Map<String, dynamic>)['message']
+            : data['message'] ?? 'Não foi possível salvar a conta.',
+      );
+    }
+    return data['user'] as Map<String, dynamic>;
   }
 
   static Future<List<ChildProfile>> fetchChildren() async {

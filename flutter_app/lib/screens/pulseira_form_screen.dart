@@ -184,14 +184,14 @@ class _PulseiraFormScreenState extends State<PulseiraFormScreen> {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const Icon(Icons.watch_rounded, size: 52, color: AppTheme.blue),
+                Icon(Icons.watch_rounded, size: 52, color: context.palette.accent),
                 const SizedBox(height: 12),
                 Text(
                   _editing
                       ? 'Atualize os dados do dispositivo.'
                       : 'Vincule uma pulseira à sua família.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppTheme.muted),
+                  style: TextStyle(color: context.palette.muted),
                 ),
                 const SizedBox(height: 26),
                 if (_loadingChildren)

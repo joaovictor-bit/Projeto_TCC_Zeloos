@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
+import 'services/app_settings.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppSettings.instance.load();
   runApp(const MyApp());
 }
 
@@ -12,34 +15,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ZELOOS',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppTheme.navy,
-          primary: AppTheme.navy,
-          secondary: AppTheme.blue,
-          surface: Colors.white,
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor: AppTheme.background,
-        appBarTheme: const AppBarTheme(backgroundColor: AppTheme.navy, foregroundColor: Colors.white),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: const Color(0xFFF7F8FC),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        ),
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppTheme.navy,
-            foregroundColor: Colors.white,
-            minimumSize: const Size.fromHeight(52),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-        ),
+    return ListenableBuilder(
+      listenable: AppSettings.instance,
+      builder: (context, _) => MaterialApp(
+        title: 'ZELOOS',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: AppSettings.instance.themeMode,
+        home: const LoginScreen(),
       ),
-      home: const LoginScreen(),
     );
   }
 }

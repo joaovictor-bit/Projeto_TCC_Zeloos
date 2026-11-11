@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/env');
-const { registerValidation, loginValidation } = require('../validators/authValidator');
+const { registerValidation, loginValidation, updateProfileValidation } = require('../validators/authValidator');
 const handleValidation = require('../validators/validationResult');
 const userRepository = require('../repositories/userRepository');
 const authMiddleware = require('../middlewares/authMiddleware');
@@ -19,7 +19,7 @@ router.post('/register', registerValidation, handleValidation, async (req, res, 
     }
 
     const senhaHash = await bcrypt.hash(senha, 10);
-    const user = await userRepository.createUser({ nome, email, senhaHash, telefone });
+    const user = await userRepository.createUser({ nome, email, senhaHash, telefone: telefone || null });
 
     const token = jwt.sign({ id: user.id, email: user.email, nome: user.nome }, JWT_SECRET, { expiresIn: '7d' });
 
@@ -64,6 +64,20 @@ router.post('/login', loginValidation, handleValidation, async (req, res, next) 
 router.get('/me', authMiddleware, async (req, res, next) => {
   try {
     const user = await userRepository.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+    }
+
+    return res.json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/me', authMiddleware, updateProfileValidation, handleValidation, async (req, res, next) => {
+  try {
+    const { nome, telefone } = req.body;
+    const user = await userRepository.updateProfile(req.user.id, { nome, telefone: telefone || null });
     if (!user) {
       return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
     }

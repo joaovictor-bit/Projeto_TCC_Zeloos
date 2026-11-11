@@ -19,4 +19,12 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-module.exports = { findByEmail, createUser, findById };
+async function updateProfile(id, { nome, telefone = null }) {
+  await db.execute(
+    'UPDATE usuarios SET nome = ?, telefone = ?, atualizado_em = NOW() WHERE id = ?',
+    [nome, telefone, id]
+  );
+  return findById(id);
+}
+
+module.exports = { findByEmail, createUser, findById, updateProfile };

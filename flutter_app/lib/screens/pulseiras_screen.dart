@@ -120,8 +120,8 @@ class _PulseirasScreenState extends State<PulseirasScreen> {
                         children: [
                           Text(
                             '${_pulseiras.length} ${_pulseiras.length == 1 ? 'dispositivo cadastrado' : 'dispositivos cadastrados'}',
-                            style: const TextStyle(
-                              color: AppTheme.muted,
+                            style: TextStyle(
+                              color: context.palette.muted,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -146,8 +146,8 @@ class _PulseirasScreenState extends State<PulseirasScreen> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: const Color(0xFFE9EDFF),
-                  child: const Icon(Icons.watch_rounded, color: AppTheme.navy),
+                  backgroundColor: context.palette.iconBg,
+                  child: Icon(Icons.watch_rounded, color: context.palette.title),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -156,15 +156,15 @@ class _PulseirasScreenState extends State<PulseirasScreen> {
                     children: [
                       Text(
                         pulseira.nomeDispositivo ?? pulseira.identificador,
-                        style: const TextStyle(
-                          color: AppTheme.navy,
+                        style: TextStyle(
+                          color: context.palette.title,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
                         child.isEmpty ? 'Perfil infantil' : child.first.nome,
-                        style: const TextStyle(color: AppTheme.muted),
+                        style: TextStyle(color: context.palette.muted),
                       ),
                     ],
                   ),
@@ -237,9 +237,9 @@ class _PulseirasScreenState extends State<PulseirasScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: AppTheme.muted),
+        Icon(icon, size: 16, color: context.palette.muted),
         const SizedBox(width: 5),
-        Text(text, style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
+        Text(text, style: TextStyle(color: context.palette.muted, fontSize: 12)),
       ],
     );
   }
@@ -251,21 +251,21 @@ class _PulseirasScreenState extends State<PulseirasScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.watch_off_outlined, size: 56, color: AppTheme.muted),
+            Icon(Icons.watch_off_outlined, size: 56, color: context.palette.muted),
             const SizedBox(height: 14),
-            const Text(
+            Text(
               'Nenhuma pulseira cadastrada',
               style: TextStyle(
-                color: AppTheme.navy,
+                color: context.palette.title,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Cadastre o identificador do dispositivo para começar a acompanhar as localizações.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.muted, height: 1.4),
+              style: TextStyle(color: context.palette.muted, height: 1.4),
             ),
             const SizedBox(height: 18),
             FilledButton.icon(
@@ -286,12 +286,12 @@ class _PulseirasScreenState extends State<PulseirasScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 48, color: AppTheme.muted),
+            Icon(Icons.cloud_off_rounded, size: 48, color: context.palette.muted),
             const SizedBox(height: 12),
             Text(
               'Não foi possível carregar as pulseiras.\n$_error',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.muted),
+              style: TextStyle(color: context.palette.muted),
             ),
             const SizedBox(height: 16),
             FilledButton.icon(

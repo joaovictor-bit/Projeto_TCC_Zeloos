@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_app/main.dart';
-import 'package:flutter_app/screens/access_screen.dart';
+import 'package:flutter_app/screens/app_settings_screen.dart';
 import 'package:flutter_app/screens/dashboard_screen.dart';
+import 'package:flutter_app/services/app_settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   testWidgets('ZELOOS login screen smoke test', (WidgetTester tester) async {
@@ -21,33 +23,74 @@ void main() {
     expect(find.text('Entrar'), findsOneWidget);
   });
 
-  testWidgets('home screen presents separate navigation options', (
+  testWidgets('register form shows optional phone with mask', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: DashboardScreen()));
+    await tester.pumpWidget(const MyApp());
+    final toggle = find.text('Ainda não tem conta? Criar conta');
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
 
-    expect(find.text('O que você deseja acessar?'), findsOneWidget);
-    expect(find.text('Editar pulseira'), findsOneWidget);
-    expect(find.text('Editar perfil'), findsOneWidget);
-    expect(find.text('Configurações'), findsOneWidget);
-    expect(find.text('Mapa'), findsOneWidget);
+    expect(find.text('Telefone (opcional)'), findsOneWidget);
+    final phoneField = find.widgetWithText(TextField, 'Telefone (opcional)');
+    await tester.enterText(phoneField, '11987654321');
+    expect(
+      tester.widget<TextField>(phoneField).controller!.text,
+      '(11) 98765-4321',
+    );
   });
 
-  testWidgets('access screen enters the home when button is tapped', (
+  testWidgets('app settings links to account screen', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(home: AccessScreen(email: 'teste@exemplo.com')),
+      const MaterialApp(home: AppSettingsScreen()),
+    );
+    await tester.scrollUntilVisible(find.text('Minha conta'), 200);
+    await tester.tap(find.text('Minha conta'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.widgetWithText(AppBar, 'Minha conta'), findsOneWidget);
+  });
+
+  testWidgets('home screen greets the user and shows shortcuts', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: DashboardScreen(userName: 'Henry Silva')),
+    );
+
+    expect(find.text('Olá, Henry!'), findsOneWidget);
+    expect(find.text('Atalhos'), findsOneWidget);
+    expect(find.text('Pulseiras'), findsOneWidget);
+    expect(find.text('Perfis'), findsOneWidget);
+    expect(find.text('Config. pulseira'), findsOneWidget);
+    expect(find.text('Mapa'), findsOneWidget);
+  });
+
+  testWidgets('app settings switches to dark theme', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    await AppSettings.instance.load();
+    await tester.pumpWidget(const MyApp());
+    final context = tester.element(find.text('ZELOOS'));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AppSettingsScreen()),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Acesso confirmado'), findsOneWidget);
-    expect(find.text('teste@exemplo.com'), findsOneWidget);
-    expect(find.text('Entrar'), findsOneWidget);
-
-    await tester.tap(find.text('Entrar'));
+    expect(find.text('Configurações do app'), findsOneWidget);
+    await tester.tap(find.text('Escuro'));
     await tester.pumpAndSettle();
 
-    expect(find.text('O que você deseja acessar?'), findsOneWidget);
+    expect(AppSettings.instance.themeMode, ThemeMode.dark);
+    expect(
+      Theme.of(tester.element(find.text('Tema'))).brightness,
+      Brightness.dark,
+    );
+    await AppSettings.instance.setThemeMode(ThemeMode.system);
   });
 }

@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../models/pulseira.dart';
 import '../services/api_service.dart';
+import '../services/app_settings.dart';
 import '../theme/app_theme.dart';
 
 class PulseiraMapScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class PulseiraMapScreen extends StatefulWidget {
 
 class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
   static const _fallbackCenter = LatLng(-14.235, -51.9253);
-  static const _refreshInterval = Duration(seconds: 15);
+  final _refreshSeconds = AppSettings.instance.mapRefreshSeconds;
   final MapController _mapController = MapController();
 
   Timer? _timer;
@@ -37,7 +38,10 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
   void initState() {
     super.initState();
     _refreshLocation();
-    _timer = Timer.periodic(_refreshInterval, (_) => _refreshLocation());
+    _timer = Timer.periodic(
+      Duration(seconds: _refreshSeconds),
+      (_) => _refreshLocation(),
+    );
   }
 
   @override
@@ -164,14 +168,14 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
             child: Row(
               children: [
-                const Icon(Icons.child_care_rounded, color: AppTheme.blue),
+                Icon(Icons.child_care_rounded, color: context.palette.accent),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     widget.childName ??
                         'Identificador: ${widget.pulseira.identificador}',
-                    style: const TextStyle(
-                      color: AppTheme.navy,
+                    style: TextStyle(
+                      color: context.palette.title,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -251,9 +255,9 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.location_searching_rounded,
-                              color: AppTheme.blue,
+                              color: context.palette.accent,
                               size: 36,
                             ),
                             const SizedBox(height: 8),
@@ -262,8 +266,8 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
                                   ? 'Aguardando a primeira localização'
                                   : 'Não foi possível atualizar a localização',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: AppTheme.navy,
+                              style: TextStyle(
+                                color: context.palette.title,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -272,15 +276,15 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
                               Text(
                                 _error!,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(color: AppTheme.muted),
+                                style: TextStyle(color: context.palette.muted),
                               ),
                             ],
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'O mapa será atualizado quando a pulseira enviar uma posição ao servidor.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: AppTheme.muted,
+                                color: context.palette.muted,
                                 height: 1.4,
                               ),
                             ),
@@ -294,7 +298,7 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
           ),
           Container(
             width: double.infinity,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
             child: SafeArea(
               top: false,
@@ -305,7 +309,7 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
                         ? Icons.location_disabled_rounded
                         : Icons.my_location_rounded,
                     color: _position == null
-                        ? AppTheme.muted
+                        ? context.palette.muted
                         : const Color(0xFF25855A),
                   ),
                   const SizedBox(width: 10),
@@ -318,19 +322,19 @@ class _PulseiraMapScreenState extends State<PulseiraMapScreen> {
                           _position == null
                               ? 'Sem localização recebida'
                               : 'Última posição recebida',
-                          style: const TextStyle(
-                            color: AppTheme.navy,
+                          style: TextStyle(
+                            color: context.palette.title,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 3),
                         Text(
                           _position == null
-                              ? 'Atualização automática a cada 15 segundos'
+                              ? 'Atualização automática a cada ${_refreshSeconds < 60 ? '$_refreshSeconds segundos' : '${_refreshSeconds ~/ 60} minuto'}'
                               : '${_position!.latitude.toStringAsFixed(5)}, ${_position!.longitude.toStringAsFixed(5)}'
                                     '${_lastUpdate == null ? '' : ' · ${_formatUpdate(_lastUpdate!)}'}',
-                          style: const TextStyle(
-                            color: AppTheme.muted,
+                          style: TextStyle(
+                            color: context.palette.muted,
                             fontSize: 12,
                           ),
                         ),

@@ -19,6 +19,7 @@ jest.mock('../src/repositories/userRepository', () => ({
   findByEmail: jest.fn(),
   createUser: jest.fn(),
   findById: jest.fn(),
+  updateProfile: jest.fn(),
 }));
 
 jest.mock('../src/config/db', () => ({
@@ -84,6 +85,40 @@ describe('Backend auth flow', () => {
     expect(userRepository.createUser).toHaveBeenCalled();
   });
 
+  test('POST /api/auth/register should save optional phone', async () => {
+    userRepository.findByEmail.mockResolvedValue(null);
+    userRepository.createUser.mockResolvedValue({ id: 1, nome: 'Responsável Demo', email: 'responsavel@demo.com', telefone: '(11) 98765-4321' });
+
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({ nome: 'Responsável Demo', email: 'responsavel@demo.com', senha: '123456', telefone: '(11) 98765-4321' });
+
+    expect(response.status).toBe(201);
+    expect(userRepository.createUser).toHaveBeenCalledWith(expect.objectContaining({ telefone: '(11) 98765-4321' }));
+  });
+
+  test('POST /api/auth/register should store null when phone is empty', async () => {
+    userRepository.findByEmail.mockResolvedValue(null);
+    userRepository.createUser.mockResolvedValue({ id: 1, nome: 'Responsável Demo', email: 'responsavel@demo.com' });
+
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({ nome: 'Responsável Demo', email: 'responsavel@demo.com', senha: '123456', telefone: '' });
+
+    expect(response.status).toBe(201);
+    expect(userRepository.createUser).toHaveBeenCalledWith(expect.objectContaining({ telefone: null }));
+  });
+
+  test('POST /api/auth/register should reject invalid phone', async () => {
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({ nome: 'Responsável Demo', email: 'responsavel@demo.com', senha: '123456', telefone: '123' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors[0].field).toBe('telefone');
+    expect(userRepository.createUser).not.toHaveBeenCalled();
+  });
+
   test('POST /api/auth/login should authenticate existing user', async () => {
     userRepository.findByEmail.mockResolvedValue({
       id: 1,
@@ -118,5 +153,53 @@ describe('Backend auth flow', () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(jwt.verify).toHaveBeenCalled();
+  });
+
+  test('PUT /api/auth/me should update name and phone of logged user', async () => {
+    userRepository.updateProfile.mockResolvedValue({
+      id: 1,
+      nome: 'Novo Nome',
+      email: 'responsavel@demo.com',
+      telefone: '(11) 98765-4321',
+      ativo: 1,
+    });
+
+    const response = await request(app)
+      .put('/api/auth/me')
+      .set('Authorization', 'Bearer fake-jwt-token')
+      .send({ nome: 'Novo Nome', telefone: '(11) 98765-4321' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.user.nome).toBe('Novo Nome');
+    expect(userRepository.updateProfile).toHaveBeenCalledWith(1, { nome: 'Novo Nome', telefone: '(11) 98765-4321' });
+  });
+
+  test('PUT /api/auth/me should clear phone when empty', async () => {
+    userRepository.updateProfile.mockResolvedValue({ id: 1, nome: 'Novo Nome', email: 'responsavel@demo.com', telefone: null });
+
+    const response = await request(app)
+      .put('/api/auth/me')
+      .set('Authorization', 'Bearer fake-jwt-token')
+      .send({ nome: 'Novo Nome', telefone: '' });
+
+    expect(response.status).toBe(200);
+    expect(userRepository.updateProfile).toHaveBeenCalledWith(1, { nome: 'Novo Nome', telefone: null });
+  });
+
+  test('PUT /api/auth/me should reject invalid data', async () => {
+    const response = await request(app)
+      .put('/api/auth/me')
+      .set('Authorization', 'Bearer fake-jwt-token')
+      .send({ nome: 'A', telefone: '12' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors.map((e) => e.field)).toEqual(['nome', 'telefone']);
+    expect(userRepository.updateProfile).not.toHaveBeenCalled();
+  });
+
+  test('PUT /api/auth/me should require token', async () => {
+    const response = await request(app).put('/api/auth/me').send({ nome: 'Novo Nome' });
+
+    expect(response.status).toBe(401);
   });
 });

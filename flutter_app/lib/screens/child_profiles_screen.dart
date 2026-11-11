@@ -85,8 +85,8 @@ class _ChildProfilesScreenState extends State<ChildProfilesScreen> {
                 children: [
                   Text(
                     '${_children.length} ${_children.length == 1 ? 'perfil cadastrado' : 'perfis cadastrados'}',
-                    style: const TextStyle(
-                      color: AppTheme.muted,
+                    style: TextStyle(
+                      color: context.palette.muted,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -99,11 +99,11 @@ class _ChildProfilesScreenState extends State<ChildProfilesScreen> {
                           horizontal: 16,
                           vertical: 8,
                         ),
-                        leading: const CircleAvatar(
-                          backgroundColor: Color(0xFFE9EDFF),
+                        leading: CircleAvatar(
+                          backgroundColor: context.palette.iconBg,
                           child: Icon(
                             Icons.child_care_rounded,
-                            color: AppTheme.navy,
+                            color: context.palette.title,
                           ),
                         ),
                         title: Text(
@@ -139,7 +139,7 @@ class _ChildProfilesScreenState extends State<ChildProfilesScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: AppTheme.muted),
+            Icon(icon, size: 48, color: context.palette.muted),
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),
@@ -250,10 +250,10 @@ class _ChildProfileFormScreenState extends State<_ChildProfileFormScreen> {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const Icon(
+                Icon(
                   Icons.child_care_rounded,
                   size: 52,
-                  color: AppTheme.blue,
+                  color: context.palette.accent,
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -261,7 +261,7 @@ class _ChildProfileFormScreenState extends State<_ChildProfileFormScreen> {
                       ? 'Atualize os dados do perfil.'
                       : 'Cadastre um perfil para organizar os dispositivos da família.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppTheme.muted),
+                  style: TextStyle(color: context.palette.muted),
                 ),
                 const SizedBox(height: 26),
                 TextFormField(

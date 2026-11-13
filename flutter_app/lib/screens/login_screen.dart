@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _hidePassword = true;
   bool _loading = false;
   String? _errorMessage;
+  String? _successMessage;
 
   @override
   void dispose() {
@@ -47,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _loading = true;
       _errorMessage = null;
+      _successMessage = null;
     });
 
     try {
@@ -64,6 +66,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result['success'] == true) {
         if (!mounted) return;
+        if (isRegister) {
+          _passwordController.clear();
+          setState(() {
+            _isRegister = false;
+            _successMessage = 'Conta criada com sucesso! Faça login para continuar.';
+          });
+          return;
+        }
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => DashboardScreen(
@@ -253,6 +263,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
+                            if (_successMessage != null) ...[
+                              const SizedBox(height: 16),
+                              Text(
+                                _successMessage!,
+                                style: const TextStyle(
+                                  color: Color(0xFF1B7F3B),
+                                ),
+                              ),
+                            ],
                             if (_errorMessage != null) ...[
                               const SizedBox(height: 16),
                               Text(
@@ -289,6 +308,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   : () => setState(() {
                                       _isRegister = !_isRegister;
                                       _errorMessage = null;
+                                      _successMessage = null;
                                     }),
                               child: Text(
                                 _isRegister

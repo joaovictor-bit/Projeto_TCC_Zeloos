@@ -65,11 +65,7 @@ class ApiService {
         )
         .timeout(AppConfig.requestTimeout);
 
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    if (response.statusCode == 201 && data['token'] != null) {
-      await saveToken(data['token'] as String);
-    }
-    return data;
+    return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
   static Future<Map<String, dynamic>> fetchMe() async {

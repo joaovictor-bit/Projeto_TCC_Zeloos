@@ -75,7 +75,7 @@ void main() {
   });
 
   group('ApiService.register', () {
-    test('omite telefone quando não informado', () async {
+    test('omite telefone e não salva token após o cadastro', () async {
       late Map<String, dynamic> corpo;
 
       await withMockHttp(
@@ -87,7 +87,7 @@ void main() {
       );
 
       expect(corpo.containsKey('telefone'), isFalse);
-      expect(await ApiService.readToken(), 't');
+      expect(await ApiService.readToken(), isNull);
     });
   });
 

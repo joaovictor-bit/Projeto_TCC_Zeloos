@@ -18,9 +18,35 @@ void main() {
   testWidgets('ZELOOS login screen smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    expect(find.text('ZELOOS'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate((w) => w is Image && w.semanticLabel == 'ZELOOS'),
+      findsOneWidget,
+    );
     expect(find.text('Acesse sua conta'), findsOneWidget);
     expect(find.text('Entrar'), findsOneWidget);
+  });
+
+  testWidgets('login screen toggles between light and dark theme', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    await AppSettings.instance.setThemeMode(ThemeMode.light);
+    await tester.pumpWidget(const MyApp());
+
+    expect(
+      find.image(const AssetImage('assets/images/zeloos_logo_navy.png')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byTooltip('Mudar para tema escuro'));
+    await tester.pumpAndSettle();
+
+    expect(AppSettings.instance.themeMode, ThemeMode.dark);
+    expect(
+      find.image(const AssetImage('assets/images/zeloos_logo_white.png')),
+      findsOneWidget,
+    );
+    expect(find.byTooltip('Mudar para tema claro'), findsOneWidget);
+    await AppSettings.instance.setThemeMode(ThemeMode.system);
   });
 
   testWidgets('register form shows optional phone with mask', (
@@ -62,12 +88,17 @@ void main() {
       const MaterialApp(home: DashboardScreen(userName: 'Henry Silva')),
     );
 
+    expect(
+      find.image(const AssetImage('assets/images/zeloos_wordmark_white.png')),
+      findsOneWidget,
+    );
     expect(find.text('Olá, Henry!'), findsOneWidget);
     expect(find.text('Atalhos'), findsOneWidget);
     expect(find.text('Pulseiras'), findsOneWidget);
     expect(find.text('Perfis'), findsOneWidget);
     expect(find.text('Config. pulseira'), findsOneWidget);
     expect(find.text('Mapa'), findsOneWidget);
+    expect(find.byTooltip('Mudar para tema escuro'), findsOneWidget);
   });
 
   testWidgets('app settings switches to dark theme', (
@@ -76,7 +107,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await AppSettings.instance.load();
     await tester.pumpWidget(const MyApp());
-    final context = tester.element(find.text('ZELOOS'));
+    final context = tester.element(find.text('Acesse sua conta'));
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const AppSettingsScreen()),
     );

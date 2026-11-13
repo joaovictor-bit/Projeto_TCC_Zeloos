@@ -5,6 +5,7 @@ import '../models/child_profile.dart';
 import '../models/pulseira.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/theme_toggle_button.dart';
 import 'alerts_screen.dart';
 import 'app_settings_screen.dart';
 import 'child_profiles_screen.dart';
@@ -96,11 +97,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'ZELOOS',
-          style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1.2),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/zeloos_pin_white.png',
+              height: 30,
+              excludeFromSemantics: true,
+            ),
+            const SizedBox(width: 10),
+            Image.asset(
+              'assets/images/zeloos_wordmark_white.png',
+              height: 18,
+              semanticLabel: 'ZELOOS',
+            ),
+          ],
         ),
         actions: [
+          const ThemeToggleButton(),
           IconButton(
             onPressed: () => _open(const AppSettingsScreen()),
             tooltip: 'Configurações do app',

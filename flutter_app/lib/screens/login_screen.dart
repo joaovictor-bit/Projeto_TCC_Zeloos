@@ -8,6 +8,7 @@ import '../services/api_service.dart';
 import 'dashboard_screen.dart';
 import '../theme/app_theme.dart';
 import '../utils/phone_input_formatter.dart';
+import '../widgets/theme_toggle_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,12 +18,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static const _pageBottom = Color(0xFF0B0F1F);
-  static const _cardColor = Color(0xFF161B30);
-  static const _fieldBorder = Color(0xFF2C3458);
-  static const _successColor = Color(0xFF4ADE80);
-  static const _errorColor = Color(0xFFFF6B6B);
-
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -138,58 +133,78 @@ class _LoginScreenState extends State<LoginScreen> {
     _successMessage = null;
   });
 
-  ThemeData _screenTheme() {
+  ThemeData _screenTheme(bool isDark, _LoginColors colors) {
     OutlineInputBorder border(Color color, [double width = 1]) =>
         OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: color, width: width),
         );
-    final base = AppTheme.dark();
+    final base = isDark ? AppTheme.dark() : AppTheme.light();
+    final palette = isDark ? AppPalette.dark : AppPalette.light;
     return base.copyWith(
       inputDecorationTheme: base.inputDecorationTheme.copyWith(
-        fillColor: const Color(0xFF1E2440),
-        labelStyle: TextStyle(color: AppPalette.dark.muted),
-        floatingLabelStyle: TextStyle(color: AppPalette.dark.accent),
-        prefixIconColor: AppPalette.dark.muted,
-        suffixIconColor: AppPalette.dark.muted,
+        fillColor: colors.fieldFill,
+        labelStyle: TextStyle(color: palette.muted),
+        floatingLabelStyle: TextStyle(color: palette.accent),
+        prefixIconColor: palette.muted,
+        suffixIconColor: palette.muted,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 18,
         ),
-        border: border(_fieldBorder),
-        enabledBorder: border(_fieldBorder),
-        focusedBorder: border(AppPalette.dark.accent, 1.6),
+        border: border(colors.fieldBorder),
+        enabledBorder: border(colors.fieldBorder),
+        focusedBorder: border(palette.accent, 1.6),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = isDark ? _LoginColors.dark : _LoginColors.light;
     return Theme(
-      data: _screenTheme(),
+      data: _screenTheme(isDark, colors),
       child: Builder(
         builder: (context) => Scaffold(
-          backgroundColor: _pageBottom,
-          body: DecoratedBox(
-            decoration: const BoxDecoration(
+          backgroundColor: colors.pageBottom,
+          body: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppTheme.navy, _pageBottom],
+                colors: [colors.pageTop, colors.pageBottom],
               ),
             ),
             child: SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 32,
+              child: Stack(
+                children: [
+                  Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 32,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 460),
+                        child: _buildCard(context, colors),
+                      ),
+                    ),
                   ),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 460),
-                    child: _buildCard(context),
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: ThemeToggleButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: colors.card,
+                        foregroundColor: AppTheme.navy,
+                        fixedSize: const Size(48, 48),
+                        side: BorderSide(color: colors.cardBorder),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -198,17 +213,18 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildCard(BuildContext context) {
+  Widget _buildCard(BuildContext context, _LoginColors colors) {
     final palette = context.palette;
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.fromLTRB(32, 40, 32, 28),
       decoration: BoxDecoration(
-        color: _cardColor,
+        color: colors.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: .06)),
+        border: Border.all(color: colors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: .35),
+            color: colors.shadow,
             blurRadius: 40,
             offset: const Offset(0, 20),
           ),
@@ -218,29 +234,11 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppTheme.blue,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.location_on_rounded,
-                color: Colors.white,
-                size: 36,
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'ZELOOS',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 4,
+            child: Image.asset(
+              colors.logo,
+              height: 120,
+              gaplessPlayback: true,
+              semanticLabel: 'ZELOOS',
             ),
           ),
           const SizedBox(height: 28),
@@ -326,11 +324,11 @@ class _LoginScreenState extends State<LoginScreen> {
           if (_successMessage != null)
             _message(
               _successMessage!,
-              _successColor,
+              colors.success,
               Icons.check_circle_outline_rounded,
             ),
           if (_errorMessage != null)
-            _message(_errorMessage!, _errorColor, Icons.error_outline_rounded),
+            _message(_errorMessage!, colors.error, Icons.error_outline_rounded),
           const SizedBox(height: 24),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -361,7 +359,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 : Text(_isRegister ? 'Criar minha conta' : 'Entrar'),
           ),
           const SizedBox(height: 28),
-          Divider(color: Colors.white.withValues(alpha: .08), height: 1),
+          Divider(color: colors.cardBorder, height: 1),
           const SizedBox(height: 16),
           Wrap(
             alignment: WrapAlignment.center,
@@ -408,5 +406,57 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     ),
+  );
+}
+
+class _LoginColors {
+  const _LoginColors({
+    required this.pageTop,
+    required this.pageBottom,
+    required this.card,
+    required this.cardBorder,
+    required this.shadow,
+    required this.fieldFill,
+    required this.fieldBorder,
+    required this.success,
+    required this.error,
+    required this.logo,
+  });
+
+  final Color pageTop;
+  final Color pageBottom;
+  final Color card;
+  final Color cardBorder;
+  final Color shadow;
+  final Color fieldFill;
+  final Color fieldBorder;
+  final Color success;
+  final Color error;
+  final String logo;
+
+  static const dark = _LoginColors(
+    pageTop: AppTheme.navy,
+    pageBottom: Color(0xFF0B0F1F),
+    card: Color(0xFF161B30),
+    cardBorder: Color(0x0FFFFFFF),
+    shadow: Color(0x59000000),
+    fieldFill: Color(0xFF1E2440),
+    fieldBorder: Color(0xFF2C3458),
+    success: Color(0xFF4ADE80),
+    error: Color(0xFFFF6B6B),
+    logo: 'assets/images/zeloos_logo_white.png',
+  );
+
+  static const light = _LoginColors(
+    pageTop: Color(0xFFE9EDFF),
+    pageBottom: AppTheme.background,
+    card: Colors.white,
+    cardBorder: Color(0x1408104E),
+    shadow: Color(0x1A08104E),
+    fieldFill: Color(0xFFF7F8FC),
+    fieldBorder: Color(0xFFD5DAEA),
+    success: Color(0xFF1B7F3B),
+    error: Color(0xFFB3261E),
+    logo: 'assets/images/zeloos_logo_navy.png',
   );
 }

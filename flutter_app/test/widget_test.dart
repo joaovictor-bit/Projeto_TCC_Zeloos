@@ -27,7 +27,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const MyApp());
-    final toggle = find.text('Ainda não tem conta? Criar conta');
+    final toggle = find.text('Criar conta');
     await tester.ensureVisible(toggle);
     await tester.tap(toggle);
     await tester.pumpAndSettle();

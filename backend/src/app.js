@@ -3,10 +3,18 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
 const { CORS_ORIGIN } = require('./config/env');
 const db = require('./config/db');
+const swaggerSpec = require('./docs/swagger');
 
 const app = express();
+
+app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: 'ZELOOS API - Documentação',
+  swaggerOptions: { persistAuthorization: true },
+}));
 
 app.use(helmet());
 app.use(express.json({ limit: '1mb' }));
@@ -24,7 +32,7 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'));
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

@@ -97,6 +97,14 @@ O app atualiza a tela do mapa a cada 15 segundos e mostra a última localizaçã
 Sem um dispositivo enviando coordenadas, o mapa informa que ainda não recebeu localização; ele não simula movimento.
 O mapa usa tiles do OpenStreetMap durante o desenvolvimento. Para uso em produção, configure um provedor de tiles que atenda aos termos e limites de uso do serviço escolhido.
 
+## Documentação da API (Swagger)
+Com a API rodando, acesse:
+
+- Interface interativa: http://localhost:3005/api-docs
+- Especificação OpenAPI (JSON): http://localhost:3005/api-docs.json
+
+A especificação fica em `src/docs/swagger.js`. Para testar rotas protegidas pela interface, chame `POST /api/auth/login`, copie o `token` da resposta, clique em **Authorize** e cole apenas o token. Ao criar ou alterar uma rota, documente-a também em `src/docs/swagger.js` — o teste `tests/swagger.test.js` falha se alguma rota da API não estiver documentada.
+
 ## Autenticação
 O token deve ser enviado no header:
 
@@ -110,6 +118,18 @@ O endpoint de recepção de geolocalização foi organizado para aceitar dados s
 ## Testes
 ```bash
 npm test
+```
+
+No PowerShell, use `npm.cmd test`. Os testes não precisam do MySQL: o banco e os repositórios são substituídos por mocks do Jest.
+
+- `tests/unit/`: testes unitários de utilitários (`geo`), middleware de autenticação, validadores, controllers e repositório de pulseiras.
+- `tests/auth.test.js` e `tests/pulseira.test.js`: testes das rotas HTTP com `supertest`.
+- `tests/swagger.test.js`: garante que o Swagger está disponível e que todas as rotas estão documentadas.
+
+Para gerar o relatório de cobertura:
+
+```bash
+npx jest --coverage
 ```
 
 ## Importante

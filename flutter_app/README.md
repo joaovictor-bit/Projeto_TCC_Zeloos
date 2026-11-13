@@ -1,17 +1,22 @@
 # flutter_app
 
-A new Flutter project.
+Aplicativo Flutter da pulseira localizadora infantil (ZELOOS).
 
-## Getting Started
+## Executar
 
-This project is a starting point for a Flutter application.
+```bash
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+Para apontar para outra API, use `--dart-define=API_BASE_URL=http://seu-servidor:3005`.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Testes
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter test
+```
+
+- `test/unit/`: testes unitários dos models (`Pulseira`, `ChildProfile`, `Alerta`), da máscara de telefone (`PhoneInputFormatter`), das preferências (`AppSettings`) e do `ApiService` (com `MockClient` do pacote `http`, sem precisar da API rodando).
+- `test/widget_test.dart`: testes de widget das telas.
+
+Para rodar só os testes unitários: `flutter test test/unit`.

@@ -3,7 +3,7 @@ const criancaRepository = require('../repositories/criancaRepository');
 
 async function listarLocaisSeguros(req, res, next) {
   try {
-    const criancaId = Number(req.params.criancaId);
+    const criancaId = Number(req.params.id);
     const locais = await localSeguroRepository.listByCrianca(criancaId);
     return res.json({ success: true, data: locais });
   } catch (error) {
@@ -13,7 +13,7 @@ async function listarLocaisSeguros(req, res, next) {
 
 async function criarLocalSeguro(req, res, next) {
   try {
-    const criancaId = Number(req.params.criancaId);
+    const criancaId = Number(req.params.id);
     const crianca = await criancaRepository.findById(criancaId);
     if (!crianca) return res.status(404).json({ success: false, message: 'Criança não encontrada.' });
 

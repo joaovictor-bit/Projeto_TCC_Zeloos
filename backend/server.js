@@ -5,8 +5,5 @@ const { PORT } = require('./src/config/env');
 
 app.listen(PORT, () => {
   console.log(`API rodando na porta ${PORT}`);
-});
-
-app.listen(PORT, () => {
-  console.log(`http://localhost:3005/api-docs`);
+  console.log(`http://localhost:${PORT}/api-docs`);
 });
